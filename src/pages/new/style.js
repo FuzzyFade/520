@@ -63,6 +63,10 @@ const move = props => (
 
 const numArray = [num1, num2, num3, num4, num5]
 
+export const Stack = styled.div`
+  position:relative
+`
+
 export const NewWapper = styled.div`
   position: absolute;
   top: 0;
@@ -74,12 +78,6 @@ export const NewWapper = styled.div`
   justify-content: center;
   align-items: center;
   filter: drop-shadow(0 0 10px rgba(58,58,58,.27));
-`
-
-export const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `
 
 export const Header = styled.div`
@@ -98,6 +96,12 @@ export const Box = styled.div`
   background: url(${outline});
 `
 
+export const Container = styled.div`
+  width: 333px;
+	height: 508px;
+  position: absolute;
+`
+
 export const Angel = styled.div`
   position: absolute;
   width: 103px;
@@ -107,7 +111,7 @@ export const Angel = styled.div`
   background: url(${angel});
 `
 
-export const QuestionText = styled.div`
+export const QuestionLogo = styled.div`
   position: absolute;
   width: 115px;
   height: 19px;
@@ -133,7 +137,7 @@ export const Di = styled.div`
 export const Num = styled.div`
   position: absolute;
   left: 59px;
-  top: 0;
+  top: 3px;
   height: 36px;
   width: 36px;
   background: url(${props => numArray[props.num - 1]}) no-repeat center;
@@ -182,12 +186,12 @@ export const Question = styled.div`
   left: 53px;
 `
 
-export const QsText = styled.div`
+export const QustionContent = styled.div`
+  margin: auto 0;
   font-family: PingFangSC-Medium;
   font-size: 16px;
   letter-spacing: .8px;
   line-height: 17px;
-  height: 50px;
   text-overflow: -o-ellipsis-lastline;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -198,14 +202,11 @@ export const QsText = styled.div`
 `
 
 export const OptionContainer = styled.div`
-  height: 240px;
+  height: 300px;
   position: absolute;
   top: 180px;
   left: 38px;
   overflow: hidden;
-`
-
-export const OptionAnimationWarpper = styled.div`
 `
 
 export const Option = styled.div`

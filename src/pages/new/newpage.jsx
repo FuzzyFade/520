@@ -1,10 +1,11 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import React, {Component} from "react";
+import {connect} from "react-redux";
 import {
   Angel,
   ArrowLeft,
   ArrowRight,
   Box,
+  Container,
   Di,
   Header,
   HeaderText,
@@ -13,88 +14,100 @@ import {
   NewWapper,
   Num,
   Option,
-  OptionAnimationWarpper,
   OptionContainer,
-  QsText,
   Question,
-  QuestionText,
+  QuestionLogo,
+  QustionContent,
   RightEye,
   SwitchBtn,
   SwitchText,
   Text,
   Ti
-} from './style'
-import 'animate.css'
-import {actionCreator} from './store'
+} from "./style";
+import "animate.css";
+import {actionCreator} from "./store";
 
-const question = "同学通过扫描二维码回答问题和小家园达到了相应的相爱度即可抽取参与小礼品嗷嗷嗷嗷嗷"     //最多39个字
-const tag = ['A', 'B', 'C', 'D']
+const tag = ["A", "B", "C", "D"]
 
 class newpage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      num: 0,
+    }
+  }
+
+  next() {
+    this.setState({num: this.state.num + 1})
+  }
+
+  back() {
+    this.setState({num: this.state.num - 1})
+  }
+
   render() {
     return (
       <NewWapper>
-        <Box>
-          <Header>
-            <HeaderText>
-              <Di/>
-              <Num num={this.props.num}/>
-              <Ti/>
-            </HeaderText>
-            <Angel/>
-            <QuestionText/>
-            <LeftEye/>
-            <RightEye/>
-          </Header>
-          <Question>
-            <QsText>{question}</QsText>
-          </Question>
-          <OptionContainer>
-            <OptionAnimationWarpper
-              className={this.props.isIn ? 'animated fadeOutLeft fast' : 'animated fadeInRight fast'}>
-              {
-                this.props.options.map((item, index) => {
-                  return (
-                    <Option key={item}>
-                      <Label>
-                        {tag[index]}
-                      </Label>
-                      <Text>{item}</Text>
-                    </Option>
-                  )
-                })
-              }
-            </OptionAnimationWarpper>
-          </OptionContainer>
-          <ArrowLeft/>
-          <ArrowRight onClick={!this.props.isIn ? this.props.changeAnswerSheet : null}/>
-          <SwitchBtn>
-            <SwitchText>换一题</SwitchText>
-          </SwitchBtn>
-        </Box>
+        <Container>
+          {this.props.new.map(item => (
+            <Container key={item.index}>
+              <Box className={this.state.num >= item.index ?
+                "animated fadeOutLeft fast" :
+                "animated fadeInLeft fast"
+              }>
+                <Header>
+                  <HeaderText>
+                    <Di/>
+                    <Num num={item.index}/>
+                    <Ti/>
+                  </HeaderText>
+                  <Angel/>
+                  <QuestionLogo/>
+                  <LeftEye/>
+                  <RightEye/>
+                </Header>
+                <Question>
+                  <QustionContent>{item.question}</QustionContent>
+                </Question>
+                <OptionContainer>
+                  {item.options.map((ele, index) => {
+                    return (
+                      <Option key={ele}>
+                        <Label>{tag[index]}</Label>
+                        <Text>{ele}</Text>
+                      </Option>
+                    );
+                  })}
+                </OptionContainer>
+                <SwitchBtn>
+                  <SwitchText>换一题</SwitchText>
+                </SwitchBtn>
+              </Box>
+            </Container>
+          ))}
+        </Container>
+        <Container>
+          <ArrowLeft onClick={() => this.back()}/>
+          <ArrowRight onClick={() => this.next()}/>
+        </Container>
       </NewWapper>
-    )
+    );
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    options: state.new.options,
-    isIn: state.new.isIn,
-    num: state.new.num
-  }
-}
+const mapStateToProps = state => {
+  return state;
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    changeAnswerSheet(e) {
-      let num = 1
-      if (num < 5 && num >= 1) {
-        num++
-        dispatch(actionCreator.changeSheetAsyncAction())
-      }
+    ChangeQusetion(e) {
+      dispatch(actionCreator.changeSheetAsyncAction());
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(newpage)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(newpage);
