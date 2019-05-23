@@ -1,100 +1,214 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import React, {Component} from "react";
 import {
+  ActiveOptionFirst,
+  ActiveOptionForth,
+  ActiveOptionSecond,
+  ActiveOptionThird,
+  Alert,
+  AlertTitle,
   Angel,
+  ArrowContainer,
   ArrowLeft,
   ArrowRight,
+  BackGround,
   Box,
+  Cancel,
+  Container,
   Di,
   Header,
   HeaderText,
   Label,
   LeftEye,
-  NewWapper,
+  NewWrapper,
+  NoArrowLeft,
+  NoArrowRight,
   Num,
   Option,
-  OptionAnimationWarpper,
   OptionContainer,
-  QsText,
+  OptionsLayOut,
   Question,
-  QuestionText,
+  QuestionLogo,
+  QustionContent,
   RightEye,
+  Sure,
   SwitchBtn,
   SwitchText,
   Text,
   Ti
-} from './style'
-import 'animate.css'
+} from "./style";
+import "animate.css";
+import {connect} from 'react-redux'
 import {actionCreator} from './store'
+import {Redirect} from 'react-router-dom'
+import debounce from 'lodash/debounce'
 
-const question = "同学通过扫描二维码回答问题和小家园达到了相应的相爱度即可抽取参与小礼品嗷嗷嗷嗷嗷"     //最多39个字
-const tag = ['A', 'B', 'C', 'D']
+const tag = ["A", "B", "C", "D"];
 
 class newpage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      num: 0,
+      alertShow: false,
+      selectTimes: 0,
+      updatedQues: false, // 是否已经出好所有题
+    };
+    this.updateQuestion = this.updateQuestion.bind(this);
+    this.next = debounce(this.next, 260);
+    this.showAlert = debounce(this.showAlert, 460);
+  }
+
+  componentDidMount() {
+    this.props.getQuestionsList(this.props.token)
+  }
+
+  next() {
+    this.setState({num: this.state.num + 1, selectTimes: this.state.selectTimes + 1})
+  }
+
+  back() {
+    this.setState({num: this.state.num - 1, selectTimes: this.state.selectTimes + 1})
+  }
+
+  selectAnswer(value) {
+    this.props.selectOption(value);
+    0 <= this.state.num && this.state.num <= 3 ?
+      this.next() :
+      this.showAlert()
+  }
+
+  showAlert() {
+    this.setState({alertShow: true})
+  }
+
+  hideAlert() {
+    this.setState({alertShow: false})
+  }
+
+  isShowArrow() {
+    return this.state.selectTimes >= 4
+  }
+
+  isShowLeft() {
+    let num = this.state.num;
+    return (1 <= num && num <= 4)
+  }
+
+  isShowRight() {
+    let num = this.state.num;
+    return (0 <= num && num <= 3)
+  }
+
+  changeYourQuestion(index) {
+    let id = parseInt(Math.random() * 41 + 1);
+    this.props.getOneQuestion(index, id, this.props.token)
+  }
+
+  static showMiddleWare(fn) {
+    return fn ? null : "none"
+  }
+
+  updateQuestion() {
+    this.setState({
+      updatedQues: true
+    })
+  }
+
   render() {
+    const {num, alertShow} = this.state;
+    const Show = newpage.showMiddleWare;
     return (
-      <NewWapper>
-        <Box>
-          <Header>
-            <HeaderText>
-              <Di/>
-              <Num num={this.props.num}/>
-              <Ti/>
-            </HeaderText>
-            <Angel/>
-            <QuestionText/>
-            <LeftEye/>
-            <RightEye/>
-          </Header>
-          <Question>
-            <QsText>{question}</QsText>
-          </Question>
-          <OptionContainer>
-            <OptionAnimationWarpper
-              className={this.props.isIn ? 'animated fadeOutLeft fast' : 'animated fadeInRight fast'}>
-              {
-                this.props.options.map((item, index) => {
-                  return (
-                    <Option key={item}>
-                      <Label>
-                        {tag[index]}
-                      </Label>
-                      <Text>{item}</Text>
-                    </Option>
+      <NewWrapper>
+        {this.props.questions.map(item => (
+          <Container key={item.index}>
+            <Box className={num >= item.index ?
+              "animated fadeOutLeft fast" :
+              "animated fadeInLeft fast"
+            }>
+              <Header>
+                <HeaderText>
+                  <Di/>
+                  <Num num={item.index}/>
+                  <Ti/>
+                </HeaderText>
+                <Angel/>
+                <QuestionLogo/>
+                <LeftEye/>
+                <RightEye/>
+              </Header>
+              <Question>
+                <QustionContent>{item.question}</QustionContent>
+              </Question>
+              <OptionContainer>
+                {
+                  item.options.map((ele, index) => {
+                      return (
+                        <OptionsLayOut key={index}>
+                          <ActiveOptionFirst style={{display: Show(item.yourOption === 0)}}/>
+                          <ActiveOptionSecond style={{display: Show(item.yourOption === 1)}}/>
+                          <ActiveOptionThird style={{display: Show(item.yourOption === 2)}}/>
+                          <ActiveOptionForth style={{display: Show(item.yourOption === 3)}}/>
+                          <Option
+                            onClick={() => this.selectAnswer({
+                              questionIndex: item.index,
+                              optionIndex: index
+                            })}>
+                            <Label>{tag[index]}</Label>
+                            <Text>{ele}</Text>
+                          </Option>
+                        </OptionsLayOut>
+                      )
+                    }
                   )
-                })
-              }
-            </OptionAnimationWarpper>
-          </OptionContainer>
-          <ArrowLeft/>
-          <ArrowRight onClick={!this.props.isIn ? this.props.changeAnswerSheet : null}/>
-          <SwitchBtn>
-            <SwitchText>换一题</SwitchText>
-          </SwitchBtn>
-        </Box>
-      </NewWapper>
-    )
+                }
+              </OptionContainer>
+              <SwitchBtn>
+                <SwitchText onClick={() => this.changeYourQuestion(item.index)}>换一题</SwitchText>
+              </SwitchBtn>
+            </Box>
+          </Container>
+        ))}
+        <ArrowContainer style={{display: Show(this.isShowArrow())}}>
+          <NoArrowLeft style={{display: Show(!this.isShowLeft())}}/>
+          <NoArrowRight style={{display: Show(!this.isShowRight())}}/>
+          <ArrowLeft onClick={() => this.back()} style={{display: Show(this.isShowLeft())}}/>
+          <ArrowRight onClick={() => this.next()} style={{display: Show(this.isShowRight())}}/>
+        </ArrowContainer>
+        <BackGround onClick={() => this.hideAlert()} style={{display: Show(alertShow)}}/>
+        <Alert style={{display: Show(alertShow)}}>
+          <AlertTitle>确认生成研究问卷</AlertTitle>
+          <Sure onClick={this.updateQuestion}>确定</Sure>
+          <Cancel onClick={() => this.hideAlert()}>取消</Cancel>
+        </Alert>
+        {this.state.updatedQues ? <Redirect to="/whisper/"/> : null}
+        {this.props.token === '' ? <Redirect to="/login/"/> : null}
+      </NewWrapper>
+    );
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
-    options: state.new.options,
-    isIn: state.new.isIn,
-    num: state.new.num
-  }
-}
+    questions: state.new,
+    token: state.login.token
+  };
+};
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    changeAnswerSheet(e) {
-      let num = 1
-      if (num < 5 && num >= 1) {
-        num++
-        dispatch(actionCreator.changeSheetAsyncAction())
-      }
+    selectOption(value) {
+      dispatch(actionCreator.selectOptionAction(value))
+    },
+    getQuestionsList(token) {
+      dispatch(actionCreator.getQuestionAction(token))
+    },
+    getOneQuestion(index, id, token) {
+      dispatch(actionCreator.getOneQuestionAction(index, id, token))
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(newpage)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(newpage);

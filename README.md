@@ -54,3 +54,14 @@ yarn build
 ## Commit Messages
 
 本项目Git commit信息遵循[Conventional Commits规范](https://www.conventionalcommits.org/en/v1.0.0-beta.3/)并且附加[Git emoji](https://gitmoji.carloscuesta.me/)
+
+5ad77db82d125112c511b713e29dcdab
+
+### Damn Bugs
+
++ poster页面添加到new的Link
++ Archive => Detail 的双方答案反了？
++ 文案 复制网址或截屏分享给好友生成报告
++ 来搞我→请输入云家园密码
++ 二维码文案：扫码成为研究员
++ 按钮文案：发起我的研究
